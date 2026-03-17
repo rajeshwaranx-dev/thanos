@@ -46,7 +46,7 @@ async def start(client:Client, message):
             msg = script.SECOND_VERIFY_COMPLETE_TEXT if key == "second_time_verified" else script.VERIFY_COMPLETE_TEXT
         await client.send_message(settings['log'], script.VERIFIED_LOG_TEXT.format(m.from_user.mention, user_id, datetime.now(pytz.timezone('Asia/Kolkata')).strftime('%d %B %Y'), num))
         btn = [[
-            InlineKeyboardButton("✅ ᴄʟɪᴄᴋ ʜᴇʀᴇ ᴛᴏ ɢᴇᴛ ꜰɪʟᴇ ✅", url=f"https://telegram.me/{temp.U_NAME}?start=file_{grp_id}_{file_id}"),
+            InlineKeyboardButton("✅ ᴄʟɪᴄᴋ ʜᴇʀᴇ ᴛᴏ ɢᴇᴛ ꜰɪʟᴇ ✅", url=f"https://telegram.me/{temp.U_NAME}?start=file_{str(grp_id).replace('-100', '')}_{file_id}"),
         ]]
         reply_markup=InlineKeyboardMarkup(btn)
         await m.reply_photo(
@@ -123,7 +123,10 @@ async def start(client:Client, message):
     except:
         pre, grp_id, file_id = "", 0, data
 
-    settings = await get_settings(int(data.split("_", 2)[1]))
+    raw_grp = data.split("_", 2)[1]
+    grp_id_int = int(f"-100{raw_grp}") if not raw_grp.startswith("-") else int(raw_grp)
+    settings = await get_settings(grp_id_int)
+    grp_id = grp_id_int
     id = settings.get('fsub_id', AUTH_CHANNEL)
     channel = int(id)
     if settings.get('fsub_id', AUTH_CHANNEL) and not await is_subscribed(client, message.from_user.id, channel):
